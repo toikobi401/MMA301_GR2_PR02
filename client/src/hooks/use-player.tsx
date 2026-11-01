@@ -54,14 +54,32 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 
   const notify = (message: string) => setNotice(message);
 
+  const goTo = (target: number) => {
+    setIndex(target);
+    // The same track queued twice keeps its URL, so the source effect below would never restart it
+    if (queue[target] && source === streamUrl(queue[target])) {
+      historySaved.current = false;
+      ended.current = false;
+      player.seekTo(0);
+      player.play();
+    }
+  };
+
+  // A finished track only counts as ended until it is played again, or its end is ignored next time
+  const rearmEnd = () => {
+    if (!ended.current) return;
+    ended.current = false;
+    historySaved.current = false;
+  };
+
   const next = () => {
-    if (queue.length > 1) setIndex((index + 1) % queue.length);
+    if (queue.length > 1) goTo((index + 1) % queue.length);
     else player.seekTo(0);
   };
 
   const playIndex = (targetIndex: number) => {
     if (targetIndex >= 0 && targetIndex < queue.length) {
-      setIndex(targetIndex);
+      goTo(targetIndex);
     }
   };
 
@@ -153,7 +171,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 
     ended.current = true;
     // No wrap-around here: a queue of broken tracks must not retry forever
-    if (index < queue.length - 1) setIndex(index + 1);
+    if (index < queue.length - 1) goTo(index + 1);
     else player.seekTo(0);
   });
 
@@ -177,14 +195,21 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         addToQueue,
         removeFromQueue,
         clearUpcomingQueue,
-        toggle: () => (status.playing ? player.pause() : player.play()),
+        toggle: () => {
+          if (status.playing) return player.pause();
+          rearmEnd();
+          player.play();
+        },
         next,
         previous: () => {
           // Like most players: restart the track unless it has only just begun
           if (status.currentTime > 3 || queue.length < 2) player.seekTo(0);
-          else setIndex((index - 1 + queue.length) % queue.length);
+          else goTo((index - 1 + queue.length) % queue.length);
         },
-        seek: (seconds) => player.seekTo(seconds),
+        seek: (seconds) => {
+          rearmEnd();
+          player.seekTo(seconds);
+        },
         toggleLoop: () => setLoop(!loop),
         stop: () => {
           player.pause();
