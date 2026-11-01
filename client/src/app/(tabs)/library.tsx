@@ -24,6 +24,7 @@ export default function LibraryScreen() {
   const paddingBottom = useTabBarSpace();
   const [tab, setTab] = useState<(typeof TABS)[number]>('Yêu thích');
   const [menuTrack, setMenuTrack] = useState<Track | null>(null);
+  const [confirmingClear, setConfirmingClear] = useState(false);
 
   const favorites = useFetch<Page<Track>>(user && tab === 'Yêu thích' ? FAVORITES : null);
   const playlists = useFetch<Page<PlaylistSummary>>(user && tab === 'Playlist' ? PLAYLISTS : null);
@@ -45,6 +46,8 @@ export default function LibraryScreen() {
   const historySongs = history.data ?? [];
 
   const clearHistory = async () => {
+    if (!confirmingClear) return setConfirmingClear(true);
+    setConfirmingClear(false);
     try {
       await api('/api/me/history', { method: 'DELETE' });
       notify('Đã xoá toàn bộ lịch sử nghe');
@@ -71,7 +74,10 @@ export default function LibraryScreen() {
             key={name}
             accessibilityRole="tab"
             accessibilityState={{ selected: tab === name }}
-            onPress={() => setTab(name)}
+            onPress={() => {
+              setTab(name);
+              setConfirmingClear(false);
+            }}
             style={[styles.tab, tab === name ? styles.tabSelected : styles.tabIdle]}>
             <Text style={styles.tabLabel}>{name}</Text>
           </Pressable>
@@ -113,7 +119,7 @@ export default function LibraryScreen() {
                 accessibilityRole="button"
                 onPress={clearHistory}
                 style={styles.clearHistoryBtn}>
-                <Text style={styles.clearHistoryBtnText}>Xoá lịch sử</Text>
+                <Text style={styles.clearHistoryBtnText}>{confirmingClear ? 'Xác nhận xoá' : 'Xoá lịch sử'}</Text>
               </Pressable>
             </View>
           )}
