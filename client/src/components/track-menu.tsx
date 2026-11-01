@@ -22,7 +22,7 @@ type Props = {
 
 export function TrackMenu({ track, onClose, isFavorite, playlistId, onChanged }: Props) {
   const { user } = useAuth();
-  const { notify } = usePlayer();
+  const { notify, addToQueue } = usePlayer();
   const [picking, setPicking] = useState(false);
   const playlists = useFetch<Page<PlaylistSummary>>(track && picking ? '/api/playlists?limit=100' : null);
 
@@ -65,6 +65,25 @@ export function TrackMenu({ track, onClose, isFavorite, playlistId, onChanged }:
           />
         )}
 
+        {track.isAvailable !== false && !picking && (
+          <>
+            <Action
+              label="Phát tiếp theo"
+              onPress={() => {
+                addToQueue(track, true);
+                close();
+              }}
+            />
+            <Action
+              label="Thêm vào hàng đợi"
+              onPress={() => {
+                addToQueue(track, false);
+                close();
+              }}
+            />
+          </>
+        )}
+
         {user && picking && (
           <>
             <LoadState loading={playlists.loading} error={playlists.error} onRetry={playlists.reload} />
@@ -104,11 +123,12 @@ export function TrackMenu({ track, onClose, isFavorite, playlistId, onChanged }:
             {track.isAvailable !== false && <Action label="Thêm vào playlist" onPress={() => setPicking(true)} />}
             {playlistId && (
               <Action
-                label="Bỏ khỏi playlist"
+                label="Xoá khỏi playlist"
+                danger
                 onPress={() =>
                   run(
                     api(`/api/playlists/${playlistId}/tracks/${trackPath(track)}`, { method: 'DELETE' }),
-                    'Đã bỏ khỏi playlist',
+                    'Đã xoá khỏi playlist',
                     true,
                   )
                 }
@@ -121,10 +141,10 @@ export function TrackMenu({ track, onClose, isFavorite, playlistId, onChanged }:
   );
 }
 
-function Action({ label, onPress }: { label: string; onPress: () => void }) {
+function Action({ label, danger, onPress }: { label: string; danger?: boolean; onPress: () => void }) {
   return (
     <Pressable accessibilityRole="button" onPress={onPress} style={styles.action}>
-      <Text numberOfLines={1} style={styles.actionLabel}>
+      <Text numberOfLines={1} style={[styles.actionLabel, danger && styles.actionDanger]}>
         {label}
       </Text>
     </Pressable>
@@ -166,5 +186,8 @@ const styles = StyleSheet.create({
     fontFamily: MusicFonts.semiBold,
     fontSize: 16,
     color: MusicColors.cream,
+  },
+  actionDanger: {
+    color: '#ff7b72',
   },
 });
