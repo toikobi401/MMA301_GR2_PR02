@@ -65,7 +65,7 @@ export default function SearchScreen() {
       />
 
       <View style={styles.genreSection}>
-        <Text style={styles.genreSectionTitle}>Thể loại phổ biến</Text>
+        <Text style={styles.genreSectionTitle}>Gợi ý tìm kiếm</Text>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}

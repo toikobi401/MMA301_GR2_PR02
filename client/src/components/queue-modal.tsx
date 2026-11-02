@@ -3,7 +3,6 @@ import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 
 import { MusicColors, MusicFonts } from '@/constants/theme';
 import { usePlayer } from '@/hooks/use-player';
-import type { Track } from '@/lib/api';
 
 type Props = {
   visible: boolean;
@@ -88,7 +87,7 @@ export function QueueModal({ visible, onClose }: Props) {
             <View style={styles.emptyBox}>
               <Text style={styles.emptyText}>Không có bài hát nào tiếp theo</Text>
               <Text style={styles.emptySub}>
-                Bấm nút (...) trên bài hát bất kỳ để "Phát tiếp theo" hoặc "Thêm vào hàng đợi"
+                Bấm nút (...) trên bài hát bất kỳ để “Phát tiếp theo” hoặc “Thêm vào hàng đợi”
               </Text>
             </View>
           ) : (

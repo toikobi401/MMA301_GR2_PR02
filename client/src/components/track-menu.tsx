@@ -116,7 +116,7 @@ export function TrackMenu({ track, onClose, isFavorite, playlistId, onChanged }:
               track.isAvailable !== false && (
                 <Action
                   label="Thích"
-                  onPress={() => run(api(favoritePath, { method: 'PUT' }), 'Đã thêm vào yêu thích')}
+                  onPress={() => run(api(favoritePath, { method: 'PUT' }), 'Đã thêm vào yêu thích', true)}
                 />
               )
             )}

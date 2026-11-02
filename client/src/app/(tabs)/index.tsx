@@ -47,37 +47,37 @@ export default function DiscoverScreen() {
       <Text style={styles.recommended}>Dành cho bạn</Text>
       <LoadState loading={trending.loading} error={trending.error} onRetry={trending.reload} />
       {recommended.map((track, i) => (
-        <Pressable
+        <View
           key={keyOf(track)}
-          accessibilityRole="button"
-          accessibilityLabel={`Phát ${track.title} của ${track.artist}`}
-          onPress={() => open(track, recommended)}
           style={[
             styles.card,
             { borderColor: CARD_STYLES[i].borderColor },
             gradient(`radial-gradient(ellipse 347px 431px at 3px 4px, ${CARD_STYLES[i].glow}, rgba(255, 255, 255, 0))`),
           ]}>
-          <Image source={track.artwork} style={styles.cardImage} />
-          <Text numberOfLines={1} style={styles.cardName}>
-            {track.artist}
-          </Text>
-          <Text numberOfLines={1} style={styles.cardTitle}>
-            {track.title}
-          </Text>
-          <Image source={require('@/assets/images/music/play-circle.png')} style={styles.playCircle} />
-          <Image
-            source={require('@/assets/images/music/play-triangle.svg')}
-            contentFit="fill"
-            style={styles.playTriangle}
-          />
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`Phát ${track.title} của ${track.artist}`}
+            onPress={() => open(track, recommended)}
+            style={StyleSheet.absoluteFill}>
+            <Image source={track.artwork} style={styles.cardImage} />
+            <Text numberOfLines={1} style={styles.cardName}>
+              {track.artist}
+            </Text>
+            <Text numberOfLines={1} style={styles.cardTitle}>
+              {track.title}
+            </Text>
+            <Image source={require('@/assets/images/music/play-circle.png')} style={styles.playCircle} />
+            <Image
+              source={require('@/assets/images/music/play-triangle.svg')}
+              contentFit="fill"
+              style={styles.playTriangle}
+            />
+          </Pressable>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={`Tùy chọn cho ${track.title}`}
             hitSlop={8}
-            onPress={(e) => {
-              (e as unknown as { stopPropagation?: () => void }).stopPropagation?.();
-              setMenuTrack(track);
-            }}
+            onPress={() => setMenuTrack(track)}
             style={styles.cardMore}>
             <Image
               source={require('@/assets/images/music/more.svg')}
@@ -85,7 +85,7 @@ export default function DiscoverScreen() {
               style={styles.cardMoreIcon}
             />
           </Pressable>
-        </Pressable>
+        </View>
       ))}
 
       {artists.length > 0 && (
