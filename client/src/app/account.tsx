@@ -58,6 +58,22 @@ export default function AccountScreen() {
               </Pressable>
             )}
 
+            {user.role === 'ADMIN' && (
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => router.push('/admin')}
+                style={styles.featureCardBtn}>
+                <View style={styles.featureIconBox}>
+                  <Text style={{ fontSize: 22 }}>🛡️</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.featureCardTitle}>Quản trị</Text>
+                  <Text style={styles.featureCardSub}>Thống kê, khoá tài khoản & ẩn bài hát</Text>
+                </View>
+                <Text style={styles.featureCardArrow}>›</Text>
+              </Pressable>
+            )}
+
             <Pressable
               accessibilityRole="button"
               onPress={async () => {

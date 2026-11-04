@@ -2,7 +2,7 @@
 
 Ứng dụng di động nghe nhạc trực tuyến, gồm app React Native (Expo) và server Express + MongoDB (bài MMA301, tự chọn đề tài).
 
-**Trạng thái:** server đã có đủ API theo thiết kế. App đã nối với server ở các màn hình Discover, Thư viện, Tìm kiếm, Tài khoản, Trình phát. Màn hình Nghệ sĩ, Admin, Lịch sử và hàng đợi riêng chưa có. Mọi mục ghi "Dự kiến" là thiết kế cho client, chưa có code.
+**Trạng thái:** server đã có đủ API theo thiết kế. App đã nối với server ở các màn hình Discover, Thư viện (gồm Lịch sử), Tìm kiếm, Tài khoản, Trình phát và hàng đợi, Studio Nghệ sĩ, Quản trị. Mọi mục ghi "Dự kiến" là thiết kế cho client, chưa có code.
 
 Tài liệu liên quan: [client/AGENTS.md](client/AGENTS.md) (quy tắc làm việc với Expo).
 
@@ -250,6 +250,7 @@ flowchart TD
 - Khoá tài khoản: đặt `isActive: false`, token hiện tại bị từ chối ngay. Bài của nghệ sĩ bị khoá vẫn công khai, Admin muốn gỡ thì ẩn từng bài.
 - Admin không khoá được tài khoản Admin.
 - Thống kê chỉ gồm số người dùng theo vai trò, số bài, số bài bị ẩn. Không đếm lượt nghe, vì nhạc Audius không đi qua server.
+- **Màn hình** `src/app/admin.tsx`, vào từ thẻ "Quản trị" ở màn hình Tài khoản khi đăng nhập Admin. Có ba tab: Thống kê, Người dùng, Bài hát. Danh sách phân trang 20 mục mỗi trang. Khoá tài khoản và ẩn bài phải bấm hai lần để xác nhận; mở khoá và hiện lại thì làm ngay. Không có nút khoá cho tài khoản Admin. Bấm ảnh bìa để nghe thử bài đang công khai.
 
 ### Xác thực bằng JWT
 

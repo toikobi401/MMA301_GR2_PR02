@@ -25,7 +25,17 @@ export type ArtistTrack = Track & {
   createdAt: string;
 };
 
-export type Page<T> = { items: T[]; total: number; page: number; limit: number };
+export type AdminUser = User & { isActive: boolean; createdAt: string };
+
+export type AdminTrack = ArtistTrack & { artistId: string };
+
+export type AdminStats = {
+  users: Record<User['role'], number>;
+  tracks: number;
+  hiddenTracks: number;
+};
+
+export type Page<T> ={ items: T[]; total: number; page: number; limit: number };
 
 export type PlaylistSummary = { id: string; name: string; trackCount: number };
 
