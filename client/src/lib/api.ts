@@ -1,4 +1,5 @@
 import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 
 export type Track = {
   source: 'AUDIUS' | 'LOCAL';
@@ -40,7 +41,9 @@ export type Page<T> ={ items: T[]; total: number; page: number; limit: number };
 export type PlaylistSummary = { id: string; name: string; trackCount: number };
 
 // `localhost` is the phone itself, so default to the machine serving the Expo bundle.
-const devHost = Constants.expoConfig?.hostUri?.split(':')[0] ?? 'localhost';
+const devHost = Platform.OS === 'web' && typeof window !== 'undefined'
+  ? window.location.hostname
+  : Constants.expoConfig?.hostUri?.split(':')[0] ?? 'localhost';
 export const API_URL = process.env.EXPO_PUBLIC_API_URL ?? `http://${devHost}:3000`;
 
 const DEFAULT_TIMEOUT_MS = 15_000;
