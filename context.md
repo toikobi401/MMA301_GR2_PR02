@@ -2,7 +2,7 @@
 
 Ứng dụng di động nghe nhạc trực tuyến, gồm app React Native (Expo) và server Express + MongoDB (bài MMA301, tự chọn đề tài).
 
-**Trạng thái:** server đã có đủ API theo thiết kế. App đã nối với server ở các màn hình Discover, Thư viện, Tìm kiếm, Tài khoản, Trình phát. Màn hình Nghệ sĩ, Admin, Lịch sử và hàng đợi riêng chưa có. Mọi mục ghi "Dự kiến" là thiết kế cho client, chưa có code.
+**Trạng thái:** server đã có đủ API theo thiết kế. App đã nối với server ở các màn hình Discover, Thư viện (gồm Lịch sử), Tìm kiếm, Tài khoản, Trình phát và hàng đợi, Studio Nghệ sĩ, Quản trị. Mọi mục ghi "Dự kiến" là thiết kế cho client, chưa có code.
 
 Tài liệu liên quan: [client/AGENTS.md](client/AGENTS.md) (quy tắc làm việc với Expo).
 
@@ -204,12 +204,13 @@ sequenceDiagram
 Dùng `expo-audio` của SDK 58.
 
 - Một trình phát toàn cục đặt trong `PlayerContext` ở `src/app/_layout.tsx`, nên nhạc không dừng khi chuyển màn hình.
-- `expo-audio` có sẵn `createAudioPlaylist`, `useAudioPlaylist` và sự kiện `trackChanged` cho hàng đợi. Hàng đợi chỉ lưu trong bộ nhớ, đóng app là mất.
+- `expo-audio` có sẵn `createAudioPlaylist`, `useAudioPlaylist` và sự kiện `trackChanged` cho hàng đợi.
+- **Nhớ bài đang nghe:** hàng đợi, bài hiện tại và chế độ lặp được lưu vào `AsyncStorage` mỗi khi đổi; vị trí nghe lưu mỗi 5 giây và khi dừng. Mở lại app thì nạp bài cũ ở trạng thái dừng, tua về chỗ đang nghe khi file tải xong, người dùng bấm phát để nghe tiếp. Bài khôi phục mà không phát được thì chỉ báo, bấm phát sẽ chuyển bài. Không dùng `expo-secure-store` vì hàng đợi không phải dữ liệu bí mật và có thể vượt giới hạn kích thước của nó.
 - **Phát nền:** bật `enableBackgroundPlayback` trong config plugin (`app.json`), gọi `setAudioModeAsync` với `shouldPlayInBackground: true` và `interruptionMode: 'doNotMix'`.
 - **Android bắt buộc gọi `setActiveForLockScreen`.** Tài liệu Expo ghi nếu không bật, nhạc sẽ dừng sau khoảng 3 phút chạy nền. Khi đổi bài thì gọi `updateLockScreenMetadata`.
 - Thuộc tính của config plugin chỉ có hiệu lực sau khi build lại app, nên dự kiến dùng **development build**, không dựa vào Expo Go. Tài liệu không nói rõ phát nền có chạy trên Expo Go không.
 - Bài lỗi khi phát (ví dụ bị gỡ khỏi Audius) thì báo ngắn gọn rồi chuyển bài tiếp theo.
-- Đăng xuất thì dừng nhạc và xoá hàng đợi.
+- Đăng xuất thì dừng nhạc, xoá hàng đợi và xoá luôn bản đã lưu, để người dùng sau không thấy bài của người trước.
 
 ### Thư viện cá nhân
 
@@ -249,6 +250,7 @@ flowchart TD
 - Khoá tài khoản: đặt `isActive: false`, token hiện tại bị từ chối ngay. Bài của nghệ sĩ bị khoá vẫn công khai, Admin muốn gỡ thì ẩn từng bài.
 - Admin không khoá được tài khoản Admin.
 - Thống kê chỉ gồm số người dùng theo vai trò, số bài, số bài bị ẩn. Không đếm lượt nghe, vì nhạc Audius không đi qua server.
+- **Màn hình** `src/app/admin.tsx`, vào từ thẻ "Quản trị" ở màn hình Tài khoản khi đăng nhập Admin. Có ba tab: Thống kê, Người dùng, Bài hát. Danh sách phân trang 20 mục mỗi trang. Khoá tài khoản và ẩn bài phải bấm hai lần để xác nhận; mở khoá và hiện lại thì làm ngay. Không có nút khoá cho tài khoản Admin. Bấm ảnh bìa để nghe thử bài đang công khai.
 
 ### Xác thực bằng JWT
 
@@ -384,7 +386,7 @@ Xem mẫu ở [server/.env.example](server/.env.example). File `.env` không đ�
 | Quyền Admin | Khoá tài khoản, ẩn bài, thống kê | Đủ việc quản trị khi không có bước duyệt |
 | Nền tảng demo | Ưu tiên Android | Máy phát triển là Windows |
 | Giới hạn số | 20 MB, 5 MB, 50 bài, 200 bài mỗi playlist, 100 dòng lịch sử, token 7 ngày | Giá trị khởi đầu cho quy mô bài tập |
-| Thư viện | Server: `multer`, `music-metadata`, `bcrypt`, `jsonwebtoken`. Client: `expo-audio`, `expo-secure-store` | Đã cài |
+| Thư viện | Server: `multer`, `music-metadata`, `bcrypt`, `jsonwebtoken`. Client: `expo-audio`, `expo-secure-store`, `@react-native-async-storage/async-storage` | Đã cài |
 
 ## 13. Câu hỏi còn mở
 
