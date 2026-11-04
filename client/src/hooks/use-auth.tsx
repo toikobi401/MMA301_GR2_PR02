@@ -1,9 +1,8 @@
-import * as SecureStore from 'expo-secure-store';
 import { createContext, use, useEffect, useState, type ReactNode } from 'react';
 
 import { api, setOnSessionExpired, setToken, type User } from '@/lib/api';
 
-const TOKEN_KEY = 'auth-token';
+import { getStoredToken, storeToken } from '@/lib/token-storage';
 
 type Credentials = { email: string; password: string };
 type Registration = Credentials & { name: string; role: 'LISTENER' | 'ARTIST' };
@@ -21,7 +20,7 @@ const AuthContext = createContext<Auth | null>(null);
 
 // A failed write only costs staying signed in after a restart, so it must not fail the login
 const saveToken = (value: string | null) =>
-  (value ? SecureStore.setItemAsync(TOKEN_KEY, value) : SecureStore.deleteItemAsync(TOKEN_KEY)).catch(console.warn);
+  storeToken(value).catch(console.warn);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -45,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     (async () => {
       try {
-        const stored = await SecureStore.getItemAsync(TOKEN_KEY);
+        const stored = await getStoredToken();
         if (stored) {
           setToken(stored);
           setUser(await api<User>('/api/me'));
